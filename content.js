@@ -83,17 +83,9 @@ function extractData() {
 
 // --- API Request ---
 async function fetchSummaryFromLLM(extractedDataString) {
-  // Construct the guiding system prompt with the extracted data
-  const prompt = `
-אתה עוזר וירטואלי למפקדים במערכת צבאית סגורה. המטרה שלך היא לנתח את ביצועי הצוער ולכתוב סיכום קצר ומתמצת עבור המפקד לקראת שיחת חתך.
-הסיכום חייב לכלול:
-1. 2-3 פסקאות של נקודות לשימור (חוזקות ומגמות חיוביות).
-2. 2-3 פסקאות של נקודות לשיפור (חולשות או מגמות שליליות).
-3. פסקה מסכמת קצרה עם תובנה כללית.
-
-להלן נתוני הצוער שחולצו:
-${extractedDataString}
-`;
+  // המערכת (System Prompt) מוגדרת בשרת Vercel. 
+  // כאן מהתוסף אנחנו שולחים נטו את הנתונים הגולמיים כ-User Prompt.
+  const prompt = `להלן נתוני הצוער שחולצו מתוך הסימולטור כעת:\n\n${extractedDataString}`;
 
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(

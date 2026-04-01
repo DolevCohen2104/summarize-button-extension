@@ -19,9 +19,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return response.json();
     })
     .then((data) => {
-      // Parse the textual response assuming general LLM API structure formats
-      const summary = data.summary || data.text || data.response || data.choices?.[0]?.text || data.generated_text || 'התקבלה תשובה תקינה אך ריקה מהשרת.';
-      sendResponse({ success: true, data: summary });
+      // Vercel already handled the LLM parsing logic and returns { success: true, data: "string" }
+      const summary = data.data || 'התקבלה תשובה תקינה אך ריקה מהשרת.';
+      sendResponse({ success: data.success !== false, data: summary });
     })
     .catch((error) => {
       console.error('Background API Error:', error);
