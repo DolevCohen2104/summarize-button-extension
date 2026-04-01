@@ -1,4 +1,4 @@
-const API_URL = 'https://summarize-button-extension.vercel.app'; 
+const API_URL = 'https://summarize-button-extension.vercel.app/api/generate'; 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'fetchSummary') {
