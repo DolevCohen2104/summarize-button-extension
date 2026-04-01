@@ -223,64 +223,135 @@ function showModal(content, extractedData) {
   document.body.appendChild(overlay);
 }
 
-// --- PDF Printing Logic ---
-function generatePDF(summaryText, rawData) {
-  const printWindow = window.open('', '_blank');
+// --- Cadet Name Extraction ---
+function extractCadetName() {
+  // The cadet's name appears as the last breadcrumb item in the page header
+  // e.g. <li class="breadcrumb-item"><div class="item-text">דוח התפתחות אישי: דולב כהן</div></li>
+  const breadcrumbItems = document.querySelectorAll('#page-navbar .breadcrumb-item .item-text');
+  if (breadcrumbItems.length === 0) return null;
   
-  if (!printWindow) {
-    alert("אנא אפשר חלונות קופצים (Popups) כדי שנוכל לייצר את הדו״ח.");
-    return;
+  const lastItem = breadcrumbItems[breadcrumbItems.length - 1];
+  const text = lastItem.textContent.trim();
+  
+  // Extract the name after the colon: "דוח התפתחות אישי: דולב כהן" -> "דולב כהן"
+  const colonIndex = text.lastIndexOf(':');
+  if (colonIndex !== -1) {
+    return text.substring(colonIndex + 1).trim();
   }
   
+  return text; // fallback: return the whole text if no colon found
+}
+
+// --- PDF Download Logic ---
+function generatePDF(summaryText, rawData) {
+  const cadetName = extractCadetName() || 'לא ידוע';
   const dateStr = new Date().toLocaleDateString('he-IL');
+  const fileName = `דוח_פיקודי_${cadetName.replace(/\s+/g, '_')}.pdf`;
 
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html dir="rtl" lang="he">
-    <head>
-      <meta charset="UTF-8">
-      <title>דו"ח ביצועי צוער - סימולטור פיקודי</title>
-      <style>
-        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; margin: 0; padding: 40px; color: #222; line-height: 1.6; }
-        .header { text-align: center; border-bottom: 3px solid #005A32; padding-bottom: 10px; margin-bottom: 25px; }
-        .header h1 { margin: 0; color: #005A32; font-size: 26px; }
-        .header h3 { margin: 5px 0 0 0; color: #555; }
-        .meta-info { display: flex; justify-content: space-between; margin-bottom: 30px; font-weight: bold; font-size: 16px; }
-        .meta-item { border-bottom: 1px dotted #888; min-width: 250px; padding-bottom: 5px; }
-        .section-title { background-color: #f0f4f2; padding: 8px 12px; border-right: 4px solid #005A32; font-size: 18px; margin-top: 30px; margin-bottom: 15px; font-weight: bold; }
-        .content-box { white-space: pre-wrap; font-size: 15px; background: #fff; padding: 15px; border-radius: 5px; margin-right: 15px; }
-        @media print { body { padding: 0; } .content-box { border: none; padding: 0; } }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>דו"ח ניתוח פיקודי</h1>
-        <h3>מערכת סימולטור מפקדים</h3>
-      </div>
-      
-      <div class="meta-info">
-        <div class="meta-item">שם הצוער: _________________</div>
-        <div class="meta-item">תאריך: ${dateStr}</div>
-      </div>
+  const htmlContent = `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>${fileName}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      color: #222;
+      line-height: 1.7;
+      direction: rtl;
+      text-align: right;
+      padding: 40px;
+      background: white;
+    }
+    .print-btn {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 12px 32px;
+      background: #005A32;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .print-btn:hover { background: #003d22; }
+    @media print { .print-btn { display: none !important; } }
+    .report-header {
+      text-align: center;
+      border-bottom: 3px solid #005A32;
+      padding-bottom: 14px;
+      margin-bottom: 28px;
+    }
+    .report-header h1 { color: #005A32; font-size: 28px; }
+    .report-header h3 { color: #555; font-size: 15px; margin-top: 6px; }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .meta-field {
+      border-bottom: 1px dotted #888;
+      padding-bottom: 4px;
+      min-width: 220px;
+    }
+    .section-title {
+      background: #f0f4f2;
+      padding: 8px 14px;
+      border-right: 4px solid #005A32;
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 14px;
+      margin-top: 24px;
+    }
+    .content-box {
+      white-space: pre-wrap;
+      font-size: 14px;
+      padding: 10px 14px;
+    }
+    .raw-data {
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">📥 שמור כ-PDF</button>
 
-      <div class="section-title">תובנות ויעדים אופרטיביים (בינה מלאכותית)</div>
-      <div class="content-box">${summaryText}</div>
+  <div class="report-header">
+    <h1>דו"ח ניתוח פיקודי</h1>
+    <h3>מערכת סימולטור מפקדים</h3>
+  </div>
 
-      <div class="section-title">נתוני סימולטור גולמיים שימשו לניתוח</div>
-      <div class="content-box" style="font-size: 13px; color: #555;">${rawData}</div>
-      
-      <script>
-        // Trigger print dialog immediately when content loads securely
-        window.onload = function() {
-          setTimeout(function() { window.print(); }, 500);
-        }
-      </script>
-    </body>
-    </html>
-  `;
+  <div class="meta-row">
+    <div class="meta-field">שם הצוער: ${cadetName}</div>
+    <div class="meta-field">תאריך: ${dateStr}</div>
+  </div>
+
+  <div class="section-title">תובנות ויעדים אופרטיביים (בינה מלאכותית)</div>
+  <div class="content-box">${summaryText}</div>
+
+  <div class="section-title">נתוני סימולטור גולמיים ששימשו לניתוח</div>
+  <div class="content-box raw-data">${rawData}</div>
+</body>
+</html>`;
+
+  // Open a new tab with the report and auto-trigger print
+  const blob = new Blob([htmlContent], { type: 'text/html; charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const tab = window.open(url, '_blank');
   
-  printWindow.document.write(htmlContent);
-  printWindow.document.close();
+  if (!tab) {
+    alert('אנא אפשר חלונות קופצים (Popups) עבור אתר זה כדי לייצא את הדוח.');
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  // Revoke the blob URL after a delay to free memory
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
 // Initialize when the DOM tree has built
