@@ -37,20 +37,24 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${API_KEY}`,
-        // 'x-goog-api-key': API_KEY 
+        'Authorization': `Bearer ${API_KEY}`, // Uncommented and using Bearer token for OpenAI compatibility
       },
-      body: JSON.stringify({ prompt: prompt }) 
+      body: JSON.stringify({ 
+        model: "gemini-2.5-flash", // Using the newer and better 2.5 flash model
+        messages: [{ role: "user", content: prompt }] // The prompt needs to be in this specific messages array structure
+      }) 
     });
 
     if (!llmResponse.ok) {
-       throw new Error(`שגיאת שרת ה-LLM החיצוני אירעה במשיכה מהענן: ${llmResponse.status} ${llmResponse.statusText}`);
+       const errorData = await llmResponse.text();
+       throw new Error(`שגיאת שרת ה-LLM החיצוני אירעה במשיכה מהענן: ${llmResponse.status} ${errorData}`);
     }
 
     const data = await llmResponse.json();
     
     // שליפת הטקסט המסוכם בהתאם למבנה ה-JSON של הספק איתו עובדים (Gemini/GPT/וכו').
-    const summary = data.summary || data.text || data.response || data.choices?.[0]?.text || data.candidates?.[0]?.content?.parts?.[0]?.text || 'התקבלה תשובה תקינה אך ריקה מהמודל.';
+    // Chat Completions format uses data.choices[0].message.content
+    const summary = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || data.summary || data.text || 'התקבלה תשובה תקינה אך ריקה מהמודל.';
 
     return res.status(200).json({ success: true, data: summary });
     

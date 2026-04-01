@@ -1,4 +1,4 @@
-const API_URL = 'https://YOUR_VERCEL_PROJECT_URL.vercel.app/api/generate'; 
+const API_URL = 'https://summarize-button-extension-qroc3dift.vercel.app/api/generate'; 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'fetchSummary') {
