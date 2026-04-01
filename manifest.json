@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "מנתח נתוני צוער",
+  "version": "1.0",
+  "description": "תוסף לחילוץ נתוני ביצועים והצגת סיכום מבוסס AI למפקד.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://api.internal.idf/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["style.css"],
+      "js": ["content.js"]
+    }
+  ]
+}

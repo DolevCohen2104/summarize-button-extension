@@ -1,0 +1,10 @@
+{
+  "name": "commander-backend",
+  "version": "1.0.0",
+  "description": "Vercel serverless backend for commander extension",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,99 @@
+/* Styling for the floating action button (FAB) */
+.commander-fab-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background-color: #0056b3; /* Blue shade suitable for military/professional context */
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  transition: background-color 0.3s, transform 0.2s;
+  direction: rtl; /* Hebrew support */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.commander-fab-btn:hover {
+  background-color: #004494;
+  transform: translateY(-2px);
+}
+
+.commander-fab-btn:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Modal Overlay covering the whole screen */
+.commander-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000;
+  font-family: system-ui, -apple-system, sans-serif;
+  direction: rtl; /* RTL Support for modal */
+}
+
+/* White centered box */
+.commander-modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  line-height: 1.6;
+}
+
+/* Modal Close Button */
+.commander-modal-close {
+  position: absolute;
+  top: 15px;
+  left: 15px; /* Positioned left for RTL layout */
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+  padding: 5px;
+  line-height: 1;
+}
+
+.commander-modal-close:hover {
+  color: #000;
+}
+
+/* Output Text Format */
+.commander-summary-text {
+  margin-top: 10px;
+  white-space: pre-wrap; /* Maintains text format & line breaks */
+  font-size: 16px;
+  color: #333;
+}
+
+.commander-modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1a202c;
+  font-size: 22px;
+  border-bottom: 2px solid #edf2f7;
+  padding-bottom: 10px;
+}
