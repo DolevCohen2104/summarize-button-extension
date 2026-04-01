@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     // ---- קריאה חסויה ל-API החיצוני ----
     // המפתח והכתובת האמיתיים נמשכים ממשתני סביבה כדי לא לחשוף אותם בתוכן התוסף שמופץ למפקדים
     // הכתובת החיצונית פה היא של השירות בו אתם משתמשים בפועל.
-    const EXTERNAL_API_URL = process.env.REAL_API_URL || 'https://api.external.service/...';
+    const EXTERNAL_API_URL = process.env.API_URL || 'https://api.external.service/...';
     const API_KEY = process.env.API_KEY || ''; 
     
     // במידה וזה API סטנדרטי (Gemini/OpenAI) מבנה הבקשה יהיה סטנדרטי עם שליחת המפתח בכותרת
