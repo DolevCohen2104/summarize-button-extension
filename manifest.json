@@ -3,10 +3,7 @@
   "name": "מנתח נתוני צוער",
   "version": "1.0",
   "description": "תוסף לחילוץ נתוני ביצועים והצגת סיכום מבוסס AI למפקד.",
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": [],
   "background": {
     "service_worker": "background.js"
   },
