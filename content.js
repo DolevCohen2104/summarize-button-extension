@@ -39,64 +39,44 @@ function initExtension() {
 
 // --- Data Extraction & Processing ---
 function extractData() {
-  // Find the exact element required by the task
+  // חיפוש האלמנט בעמוד
   const skillsElement = document.querySelector('.skills-grid');
   
   if (!skillsElement) {
     throw new Error('לא נמצא אלמנט עם הקלאס .skills-grid בעמוד.');
   }
 
-  // Retrieve the JSON string from the data-charts attribute
+  // שליפת המחרוזת של ה-JSON
   const dataChartsAttr = skillsElement.getAttribute('data-charts');
   
   if (!dataChartsAttr) {
     throw new Error('לא נמצא Attribute בשם data-charts באלמנט.');
   }
 
-  let jsonData;
+  let rawData;
   try {
-    // Parse the attribute string to a JSON object
-    jsonData = JSON.parse(dataChartsAttr);
+    rawData = JSON.parse(dataChartsAttr);
   } catch (e) {
     throw new Error('שגיאה בפענוח נתוני ה-JSON מה-Attribute.');
   }
 
-  if (!Array.isArray(jsonData)) {
+  if (!Array.isArray(rawData)) {
     throw new Error('הנתונים אינם במבנה של מערך כנדרש.');
   }
 
-  // Process data into a formatted string
-  let processedDataString = 'נתוני צוער מפורטים:\n';
-  
-  // Translation map for trends
-  const trendTranslations = {
-    'stable': 'יציב',
-    'fluctuating': 'תנודתי',
-    'improving': 'במגמת עליה',
-    'declining': 'במגמת ירידה'
-  };
-
-  jsonData.forEach(skill => {
-    // Validate entry fields
-    if (!skill.skillName || !Array.isArray(skill.data) || skill.data.length === 0) {
-      return; 
-    }
-    
-    // Calculate historical average
-    const sum = skill.data.reduce((acc, val) => acc + val, 0);
-    const avg = (sum / skill.data.length).toFixed(2);
-    
-    // Get latest score
-    const lastScore = skill.data[skill.data.length - 1];
-    
-    // Translate trend to Hebrew
-    const translatedTrend = trendTranslations[skill.trend?.toLowerCase()] || skill.trend || 'לא ידוע';
-
-    // Construct a specific string for each skill
-    processedDataString += `- [${skill.skillName}]: ממוצע ציונים ${avg}/5, ציון אחרון ${lastScore}/5. מגמה: ${translatedTrend}\n`;
+  // ניקוי הנתונים: השארת המידע הקריטי בלבד למודל
+  const cleanData = rawData.map(skill => {
+    return {
+      skillName: skill.skillName,
+      scores: skill.data, // רצף הציונים המלא - קריטי כדי לזהות תהליך למידה או שבירה
+      trend: skill.trend,
+      simulations: skill.simulationNames // קריטי כדי להבין באיזה הקשר הושג הציון (שטח מול שגרה)
+    };
   });
 
-  return processedDataString;
+  // החזרת הנתונים כמחרוזת JSON מסודרת ונקייה שמוכנה להיכנס לפרומפט
+  console.log(JSON.stringify(cleanData, null, 2));
+  return JSON.stringify(cleanData, null, 2);
 }
 
 // --- API Request ---
