@@ -7,17 +7,20 @@
     "activeTab",
     "scripting"
   ],
-  "host_permissions": [
-    "https://api.internal.idf/*"
-  ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.idf.il/*"],
-      "css": ["style.css"],
-      "js": ["content.js"]
+      "matches": [
+        "*://*.idf.il/*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ]
 }
