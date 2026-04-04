@@ -107,6 +107,37 @@ async function fetchSummaryFromLLM(extractedDataString) {
   });
 }
 
+// --- Data Formatting for UI ---
+function formatDataForUI(jsonString) {
+  try {
+    const data = JSON.parse(jsonString);
+    let output = '';
+    
+    const trendTranslations = {
+      'stable': 'יציב',
+      'fluctuating': 'תנודתי',
+      'improving': 'במגמת עליה',
+      'declining': 'במגמת ירידה'
+    };
+    
+    data.forEach(skill => {
+      // Calculate averages if scores exist
+      const avg = skill.scores && skill.scores.length > 0 
+        ? (skill.scores.reduce((a, b) => a + b, 0) / skill.scores.length).toFixed(1) 
+        : 'אין ציון';
+        
+      const trend = trendTranslations[skill.trend?.toLowerCase()] || skill.trend || 'לא ידוע';
+      
+      output += `• [${skill.skillName}]: ממוצע ציונים ${avg}/5 | מגמה: ${trend}\n`;
+    });
+    
+    return output || 'לא סופקו נתונים קריאים.';
+  } catch (e) {
+    // If parsing fails, return the raw string as fallback
+    return jsonString;
+  }
+}
+
 // --- Main Trigger Handler ---
 async function handleAnalyzeClick() {
   const button = document.getElementById('commander-analyze-btn');
@@ -127,8 +158,9 @@ async function handleAnalyzeClick() {
     // 3. Call the Internal LLM API
     const summary = await fetchSummaryFromLLM(extractedData);
 
-    // 4. Show insights in Modal overlay
-    showModal(summary, extractedData);
+    // 4. Show insights in Modal overlay (format the raw JSON for human readability)
+    const formattedData = formatDataForUI(extractedData);
+    showModal(summary, formattedData);
 
   } catch (error) {
     alert(`שגיאה בביצוע הפעולה:\n${error.message}`);
